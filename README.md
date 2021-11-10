@@ -1,6 +1,7 @@
 # jepsen.neo4j
 
-FIXME: description
+Messing around with [Jepsen](https://jepsen.io/) tests for Neo4j. 
+Currently following the etcd [tutorial](https://github.com/jepsen-io/jepsen/tree/main/doc/tutorial).
 
 ## Installation
 
