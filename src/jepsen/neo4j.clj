@@ -86,8 +86,7 @@
           :db (db "4.3.7")
           :client (Client. nil)
           :checker (checker/compose
-                    {:perf (checker/perf)
-                     :linear (checker/linearizable
+                    {:linear (checker/linearizable
                               {:model (model/register)
                                :algorithm :linear})
                      :timeline (timeline/html)})
