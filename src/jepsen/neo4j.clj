@@ -6,9 +6,12 @@
              [control :as c]
              [client :as client]
              [db :as db]
+             [checker :as checker]
              [generator :as gen]
              [tests :as tests]]
+            [jepsen.checker.timeline :as timeline]
             [jepsen.control.util :as cu]
+            [knossos.model :as model]
             [jepsen.os.debian :as debian]))
 
 ;;; client
@@ -28,9 +31,10 @@
 
   (invoke! [_ test op]
     (case (:f op)
-      :read (assoc op :type :ok, :value
-                   (nc/find-node conn {:ref-id "n"
-                                       :props {:name "Jack"}}))
+      :read (assoc op
+                   :type :ok,
+                   :value (get-in (nc/find-node conn {:ref-id "n"
+                                                :props {:name "Jack"}}) [:props :rating] ))
       :write (do
                (nc/update-props! conn {:props {:name "Jack"}} {:rating (:value op)})
                (assoc op :type :ok))))
@@ -81,6 +85,12 @@
           :os debian/os
           :db (db "4.3.7")
           :client (Client. nil)
+          :checker (checker/compose
+                    {:perf (checker/perf)
+                     :linear (checker/linearizable
+                              {:model (model/register)
+                               :algorithm :linear})
+                     :timeline (timeline/html)})
           :generator       (->> (gen/mix [r w])
                                 (gen/stagger 1)
                                 (gen/nemesis nil)
