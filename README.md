@@ -2,6 +2,7 @@
 
 Messing around with [Jepsen](https://jepsen.io/) tests for Neo4j. 
 Currently following the etcd [tutorial](https://github.com/jepsen-io/jepsen/tree/main/doc/tutorial).
+Jepsen [docs](https://cljdoc.org/d/jepsen/jepsen/0.1.15/api/jepsen).
 
 ## Installation
 
