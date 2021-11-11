@@ -4,19 +4,22 @@ Messing around with [Jepsen](https://jepsen.io/) tests for Neo4j.
 Currently following the etcd [tutorial](https://github.com/jepsen-io/jepsen/tree/main/doc/tutorial).
 Jepsen [docs](https://cljdoc.org/d/jepsen/jepsen/0.1.15/api/jepsen).
 
+Currently grabs a neo4j community instance, creates 1 node and reads/writes a property on it.
+Testing that the result is linearizable.
+
 ## Installation
 
 Download from http://example.com/FIXME.
 
 ## Usage
 
-FIXME: explanation
+Run a test:
 
-    $ java -jar jepsen.neo4j-0.1.0-standalone.jar [args]
+    $ lein run test --node <public_ip> --ssh-private-key <private_key> --username <user>
 
 ## Options
 
-FIXME: listing of options this app accepts.
+Supply a public IP and ssh creds.
 
 ## Examples
 
@@ -32,7 +35,7 @@ FIXME: listing of options this app accepts.
 
 ## License
 
-Copyright © 2021 FIXME
+Copyright © 2021 Jack Waudby
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
