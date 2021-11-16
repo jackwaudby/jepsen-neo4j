@@ -1,6 +1,6 @@
 # jepsen.neo4j
 
-Messing around with [Jepsen](https://jepsen.io/) tests for Neo4j. 
+Messing around with [Jepsen](https://jepsen.io/) tests for Neo4j.
 Currently following the etcd [tutorial](https://github.com/jepsen-io/jepsen/tree/main/doc/tutorial).
 Jepsen [docs](https://cljdoc.org/d/jepsen/jepsen/0.1.15/api/jepsen).
 
@@ -12,6 +12,10 @@ Testing that the result is linearizable.
 Download from http://example.com/FIXME.
 
 ## Usage
+
+1. Start VMs in Azure.
+2. Load tarball on each VM.
+3.
 
 Run a test:
 
@@ -29,9 +33,24 @@ Supply a public IP and ssh creds.
 
 ...
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+### Test Scaffolding
+
+Assumes 3 VMs are running in Azure, each with a Neo4j tarball.
+All necessary ports must be open. TODO: list them.
+
+### Database Automation
+
+1. Extract files from tarball.
+2. Set the following config parameters in `conf/neo4j`:
+```
+dbms.default_listen_address=0.0.0.0
+dbms.default_advertised_address=<public-ip>
+dbms.mode=CORE
+causal_clustering.initial_discovery_members=<public-ip-1>:5000,<public-ip-2>:5000,<public-ip-3>:5000
+```
+3. Start the DBMS.
+4. Shutdown the DBMS.
+5. Delete the files.
 
 ## License
 
