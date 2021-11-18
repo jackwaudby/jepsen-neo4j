@@ -26,10 +26,9 @@
     (assoc this :conn (nc/connect (str "neo4j://" node ":7687") "neo4j" "neo4j")))
 
   (setup! [this test]
-    ;; (info (nc/create-node! conn {:ref-id "p"
-    ;;                              :labels [:person]
-    ;;                              :props {:name "Jack"}}))
-    )
+    (info (nc/create-node! conn {:ref-id "p"
+                                 :labels [:person]
+                                 :props {:name "Jack"}})))
 
   (invoke! [_ test op]
     (case (:f op)
@@ -71,27 +70,27 @@
   [version]
   (reify db/DB
     (setup! [_ test node]
-      ;; (info node "installing neo4j" version)
-      ;; (c/su
-      ;;  (c/exec* (str "cd " homedir " && tar -xvf neo4j-enterprise-4.4.0-dev-unix.tar.gz"))
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.mode/dbms.mode/g' " conffile))
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.default_listen_address/dbms.default_listen_address/g' " conffile))
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#causal_clustering.initial_discovery_members=localhost:5000,localhost:5001,localhost:5002/causal_clustering.initial_discovery_members=" (initial-discovery-members test) "/g' " conffile))
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.default_advertised_address=localhost/dbms.default_advertised_address=" node "/g' " conffile))
+      (info node "installing neo4j" version)
+      (c/su
+       (c/exec* (str "cd " homedir " && tar -xvf neo4j-enterprise-4.4.0-dev-unix.tar.gz"))
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.mode/dbms.mode/g' " conffile))
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.default_listen_address/dbms.default_listen_address/g' " conffile))
+       (c/exec* (str "cd " homedir " && sed -i 's/#causal_clustering.initial_discovery_members=localhost:5000,localhost:5001,localhost:5002/causal_clustering.initial_discovery_members=" (initial-discovery-members test) "/g' " conffile))
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.default_advertised_address=localhost/dbms.default_advertised_address=" node "/g' " conffile))
 
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.security.auth_enabled=false/dbms.security.auth_enabled=false/g' " conffile))
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.security.auth_enabled=false/dbms.security.auth_enabled=false/g' " conffile))
 
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.routing.enabled=false/dbms.routing.enabled=true/g' " conffile))
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.routing.listen_address/dbms.routing.listen_address/g' " conffile))
-      ;;  (c/exec* (str "cd " homedir " && sed -i 's/#dbms.routing.advertised_address=:7688/dbms.routing.advertised_address=" node ":7688/g' " conffile))
-      ;;  (info (c/exec* (str directory "/bin/neo4j start"))))
-      ;; (Thread/sleep 50000)
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.routing.enabled=false/dbms.routing.enabled=true/g' " conffile))
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.routing.listen_address/dbms.routing.listen_address/g' " conffile))
+       (c/exec* (str "cd " homedir " && sed -i 's/#dbms.routing.advertised_address=:7688/dbms.routing.advertised_address=" node ":7688/g' " conffile))
+       (info (c/exec* (str directory "/bin/neo4j start"))))
+      (Thread/sleep 50000)
       (info "done waiting"))
 
     (teardown! [_ test node]
-      ;; (info (c/su (c/exec* (str directory "/bin/neo4j stop || true"))))
-      ;; (info node "tearing down neo4j")
-      ;; (c/su (c/exec :rm :-rf directory))
+      (info (c/su (c/exec* (str directory "/bin/neo4j stop || true"))))
+      (info node "tearing down neo4j")
+      (c/su (c/exec :rm :-rf directory))
       )
 
     db/LogFiles
