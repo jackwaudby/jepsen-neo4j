@@ -6,6 +6,7 @@
             [jepsen [cli :as cli]
              [control :as c]
              [client :as client]
+             [nemesis :as nemesis]
              [db :as db]
              [checker :as checker]
              [generator :as gen]
@@ -17,7 +18,7 @@
 
 ;;; client
 ;;; model neo4j as a single node with 1 property that we read and write.
-(defn r  [_ _]  {:type :invoke, :f :read, :value 5})
+(defn r  [_ _]  {:type :invoke, :f :read, :value 11})
 (defn w  [_ _]  {:type :invoke, :f :write, :value (rand-int 10)})
 
 (defrecord Client [conn]
@@ -28,7 +29,8 @@
   (setup! [this test]
     (info (nc/create-node! conn {:ref-id "p"
                                  :labels [:person]
-                                 :props {:name "Jack"}})))
+                                 :props {:name "Jack"
+                                         :rating 11}})))
 
   (invoke! [_ test op]
     (case (:f op)
@@ -90,35 +92,37 @@
     (teardown! [_ test node]
       (info (c/su (c/exec* (str directory "/bin/neo4j stop || true"))))
       (info node "tearing down neo4j")
-      (c/su (c/exec :rm :-rf directory))
-      )
+      (c/su (c/exec :rm :-rf directory)))
 
     db/LogFiles
     (log-files [_ test node]
-      [logfile])
-    ))
+      [logfile])))
 
 (defn neo4j-test
   "Given an options map from the command line runner (e.g. :nodes, :ssh,
   :concurrency, ...), constructs a test map."
   [opts]
   (merge tests/noop-test
+         opts
          {:pure-generators true
           :name "neo4j"
           :os debian/os
           :db (db "4.3.7")
           :client (Client. nil)
+          :nemesis         (nemesis/partition-random-halves)
           :checker (checker/compose
                     {:linear (checker/linearizable
                               {:model (model/register)
                                :algorithm :linear})
                      :timeline (timeline/html)})
           :generator       (->> (gen/mix [r w])
-                                (gen/stagger 1)
-                                (gen/nemesis nil)
-                                (gen/time-limit 15))
-          }
-         opts))
+                                (gen/stagger 1/50)
+                                (gen/nemesis
+                                 (cycle [(gen/sleep 5)
+                                         {:type :info, :f :start}
+                                         (gen/sleep 5)
+                                         {:type :info, :f :stop}]))
+                                (gen/time-limit (:time-limit opts)))}))
 
 (defn -main
   "Handles command line arguments. Can either run a test, or a web server for
