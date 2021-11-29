@@ -18,7 +18,7 @@
 
 ;;; client
 ;;; model neo4j as a single node with 1 property that we read and write.
-(defn r  [_ _]  {:type :invoke, :f :read, :value 11})
+(defn r  [_ _]  {:type :invoke, :f :read, :value nil})
 (defn w  [_ _]  {:type :invoke, :f :write, :value (rand-int 10)})
 
 (defrecord Client [conn]
@@ -29,8 +29,7 @@
   (setup! [this test]
     (info (nc/create-node! conn {:ref-id "p"
                                  :labels [:person]
-                                 :props {:name "Jack"
-                                         :rating 11}})))
+                                 :props {:name "Jack"}})))
 
   (invoke! [_ test op]
     (case (:f op)
@@ -109,7 +108,7 @@
           :os debian/os
           :db (db "4.3.7")
           :client (Client. nil)
-          :nemesis         (nemesis/partition-random-halves)
+          :nemesis         (nemesis/partition-random-node)
           :checker (checker/compose
                     {:linear (checker/linearizable
                               {:model (model/register)
